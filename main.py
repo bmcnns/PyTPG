@@ -5,19 +5,21 @@ from typing import List
 from environment import Environment
 from debugger import Debugger
 import sys
+from instruction import Instruction
+from program import Program
 
 def main():
 
-    sys.setrecursionlimit(1500)
     environment: Environment = Environment()
     model: Model = Model()
     debugger: Debugger = Debugger()
 
     try:
-        model.fit(environment, 100, 1000)
+        model.fit(environment, 200, 1000)
+        #print(debugger.getInformation(model))
+        #debugger.screenshot(model)
     except RuntimeError as e:
-        print(debugger.getInformation(model.programPopulation, model.teamPopulation))
         raise e
-    
+
 if __name__ == "__main__":
     main()
