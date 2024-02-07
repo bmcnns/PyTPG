@@ -23,7 +23,6 @@ class Environment:
         return np.array(self.env.reset()[0]).flatten()
 
     def step(self, action: str) -> Tuple[List[float], float, bool]:
-        print(state)
         index: int = Parameters.ACTIONS.index(action)
         assert(type(index) == int)
         
