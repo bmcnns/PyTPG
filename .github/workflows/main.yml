@@ -1,0 +1,98 @@
+name: Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      POPULATION_SIZE:
+        description: 'The population size'
+        required: false
+        default: '360'
+      INITIAL_PROGRAM_POPULATION:
+        description: 'The initial program population'
+        required: false
+        default: '1000'
+      POPGAP:
+        description: 'The popgap value'
+        required: false
+        default: '0.5'
+      ACTIONS:
+        description: 'The actions list'
+        required: false
+        default: '["DO_NOTHING", "STEER_LEFT", "STEER_RIGHT", "GAS", "BRAKE"]'
+      ENVIRONMENT:
+        description: 'The environment'
+        required: false
+        default: 'CarRacing-v2'
+      NUM_OBSERVATIONS:
+        description: 'The number of observations'
+        required: false
+        default: '27648'
+      NUM_REGISTERS:
+        description: 'The number of registers'
+        required: false
+        default: '8'
+      DELETE_INSTRUCTION_PROBABILITY:
+        description: 'The delete instruction probability'
+        required: false
+        default: '0.7'
+      ADD_INSTRUCTION_PROBABILITY:
+        description: 'The add instruction probability'
+        required: false
+        default: '0.7'
+      SWAP_INSTRUCTION_PROBABILITY:
+        description: 'The swap instruction probability'
+        required: false
+        default: '1.0'
+      MUTATE_INSTRUCTION_PROBABILITY:
+        description: 'The mutate instruction probability'
+        required: false
+        default: '1.0'
+      ADD_PROGRAM_PROBABILITY:
+        description: 'The add program probability'
+        required: false
+        default: '0.7'
+      DELETE_PROGRAM_PROBABILITY:
+        description: 'The delete program probability'
+        required: false
+        default: '0.7'
+      NEW_PROGRAM_PROBABILITY:
+        description: 'The new program probability'
+        required: false
+        default: '0.1'
+      MUTATE_PROGRAM_PROBABILITY:
+        description: 'The mutate program probability'
+        required: false
+        default: '0.2'
+      TEAM_POINTER_PROBABILITY:
+        description: 'The team pointer probability'
+        required: false
+        default: '0.5'
+      MAX_INSTRUCTION_COUNT:
+        description: 'The max instruction count'
+        required: false
+        default: '97'
+      MAX_INITIAL_TEAM_SIZE:
+        description: 'The max initial team size'
+        required: false
+        default: '5'
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies
+        run: |
+            pip install -e .
+            
+      - name: Run
+        run: |
+          python main.py --POPULATION_SIZE ${{github.event.inputs.POPULATION_SIZE}} --INITIAL_PROGRAM_POPULATION ${{github.event.inputs.INITIAL_PROGRAM_POPULATION}} --POPGAP ${{github.event.inputs.POPGAP}} --ACTIONS ${{github.event.inputs.ACTIONS}} --ENVIRONMENT ${{github.event.inputs.ENVIRONMENT}} --NUM_OBSERVATIONS ${{github.event.inputs.NUM_OBSERVATIONS}} --NUM_REGISTERS ${{github.event.inputs.NUM_REGISTERS}} --DELETE_INSTRUCTION_PROBABILITY ${{github.event.inputs.DELETE_INSTRUCTION_PROBABILITY}} --ADD_INSTRUCTION_PROBABILITY ${{github.event.inputs.ADD_INSTRUCTION_PROBABILITY}} --SWAP_INSTRUCTION_PROBABILITY ${{github.event.inputs.SWAP_INSTRUCTION_PROBABILITY}} --MUTATE_INSTRUCTION_PROBABILITY ${{github.event.inputs.MUTATE_INSTRUCTION_PROBABILITY}} --ADD_PROGRAM_PROBABILITY ${{github.event.inputs.ADD_PROGRAM_PROBABILITY}} --DELETE_PROGRAM_PROBABILITY ${{github.event.inputs.DELETE_PROGRAM_PROBABILITY}} --NEW_PROGRAM_PROBABILITY ${{github.event.inputs.NEW_PROGRAM_PROBABILITY}} --MUTATE_PROGRAM_PROBABILITY ${{github.event.inputs.MUTATE_PROGRAM_PROBABILITY}} --TEAM_POINTER_PROBABILITY ${{github.event.inputs.TEAM_POINTER_PROBABILITY}} --MAX_INSTRUCTION_COUNT ${{github.event.inputs.MAX_INSTRUCTION_COUNT}} --MAX_INITIAL_TEAM_SIZE ${{github.event.inputs.MAX_INITIAL_TEAM_SIZE}}
