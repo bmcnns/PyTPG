@@ -1,7 +1,10 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="PyTPG",
-    version="0.1",
+    name='your_package_name',
+    version='0.1',
     packages=find_packages(),
+    install_requires=[
+        'pdoc',
+    ],
 )
