@@ -30,6 +30,7 @@ on:
 
 jobs:
   deploy:
+    timeout-minutes: 4320
     runs-on: self-hosted
 
     steps:
