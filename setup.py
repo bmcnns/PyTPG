@@ -28,6 +28,7 @@ setup(
         'seaborn',
         'tqdm',
         'tzdata',
-        'unittest-xml-reporting'
+        'unittest-xml-reporting',
+        'networkx',
     ],
 )
