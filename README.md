@@ -1,3 +1,5 @@
+[View documentation here](https://bmcnns.github.io/pytpg-vanilla/)
+
 *** TODO Write unit tests
 *** TODO Add automatic documentation
 *** TODO Add Atari environments
