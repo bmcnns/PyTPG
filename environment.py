@@ -1,33 +1,50 @@
 from typing import Tuple, List
 from parameters import Parameters
-import gym
 import numpy as np
+from ale_py import ALEInterface
+from ale_py.roms import Frostbite, UpNDown
+from atari import Atari
+import random
 
-"""
-This Environment class serves as a generic interface to ANY environment
-and forces the implementation of functions: reset and step.
-"""
 class Environment:
 
-    """ Creates an environment based on Parameters.ENVIRONMENT.
-        A parameter is passed to ensure the action space is discrete.
-    """
+    def reset(self) -> np.array:
+        raise NotImplementedError("Don't use Environment class directly..")
+
+    def step(self, action) -> Tuple[np.array, float, bool]:
+        raise NotImplementedError("Don't use Environment class directly.")
+
+class GymEnvironment(Environment):
+
     def __init__(self):
-        self.env = gym.make(Parameters.ENVIRONMENT, continuous=False)
+        self.env = gym.make(Parameters.ENVIRONMENT)
         
-    """
-    Reset the environment to its initial state.
-    Returns observations
-    """
-    def reset(self) -> List[float]:
+    def reset(self) -> np.array:
         return np.array(self.env.reset()[0]).flatten()
 
-    def step(self, action: str) -> Tuple[List[float], float, bool]:
+    def step(self, action: str) -> Tuple[np.array, float, bool]:
         index: int = Parameters.ACTIONS.index(action)
-        assert(type(index) == int)
+        state, reward, isTerminated, isTruncated, _ = self.env.step(index)
+        return (np.array(state).flatten(), reward, isTerminated or isTruncated)
+
+class ALEEnvironment(Environment):
+
+    def __init__(self, environment: str):
+        self.ale = ALEInterface()
         
-        try:
-            state, reward, isTerminated, isTruncated, _ = self.env.step(index)
-            return (np.array(state).flatten(), reward, isTerminated or isTruncated) 
-        except:
-            print(f"ERROR: index is {index}")
+        if environment == "Frostbite":
+            return self.ale.loadROM(Frostbite)
+        elif environment == "UpNDown":
+            return self.ale.loadROM(UpNDown)
+        else:
+            raise RuntimeError("Environment could not be loaded: ROM not found.")
+    
+    def reset(self) -> np.array:
+        self.ale.reset_game()
+        return Atari.preprocess(self.ale.getScreenRGB())
+
+    def step(self, action: int) -> Tuple[np.array, float, bool]:
+        reward = self.ale.act(action)
+        return (Atari.preprocess(self.ale.getScreenRGB()), reward, self.ale.game_over())
+
+    

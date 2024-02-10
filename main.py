@@ -2,15 +2,16 @@ from model import Model
 
 import random
 from typing import List
-from environment import Environment
+from environment import ALEEnvironment
 from debugger import Debugger
 import sys
 from instruction import Instruction
 from program import Program
+from parameters import Parameters
 
 def main():
 
-    environment: Environment = Environment()
+    environment: Environment = ALEEnvironment(Parameters.ENVIRONMENT)
     model: Model = Model()
     debugger: Debugger = Debugger()
 

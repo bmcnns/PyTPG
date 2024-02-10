@@ -4,9 +4,9 @@ class Parameters:
     POPULATION_SIZE: int = 360
     INITIAL_PROGRAM_POPULATION: int = 1000
     POPGAP: float = 0.5
-    ACTIONS: List[str] = [ "DO_NOTHING", "STEER_LEFT", "STEER_RIGHT", "GAS", "BRAKE" ]
-    ENVIRONMENT: str = "CarRacing-v2"
-    NUM_OBSERVATIONS: int = 27648
+    ACTIONS: List = range(0, 18) 
+    ENVIRONMENT: str = "Frostbite"
+    NUM_OBSERVATIONS: int = 1344
     NUM_REGISTERS: int = 8
     DELETE_INSTRUCTION_PROBABILITY: float = 0.7
     ADD_INSTRUCTION_PROBABILITY: float = 0.7
