@@ -8,6 +8,21 @@ class Mutator:
 
     @staticmethod
     def mutateInstruction(instruction: Instruction) -> None:
+        """
+        An instruction can be mutated by:
+
+        - Changing its input source (program registers or state/observations from the environment).
+
+        - Changing its operation
+
+        - Changing the source register
+
+        - Changing the destination register
+
+        It is guaranteed that a mutation will produce an instruction distinct from the original.
+
+        :param instruction: the instruction to mutate
+        """
         parts: List[str] = [ "ADDRESSING_MODE", "OPERATION", "SOURCE REGISTER", "DESTINATION REGISTER"]
         mutatedPart: str = random.choice(parts)
 
@@ -42,7 +57,25 @@ class Mutator:
 
     @staticmethod
     def mutateProgram(program: Program) -> None:
+        """
+        A program can be mutated by:
 
+        - Deleting an instruction
+        
+        - Adding an instruction
+        
+        - Swapping an instruction
+        
+        - Mutating an instruction
+
+        An instruction will be deleted iff there is more than one instruction in the program.
+
+        An instruction will be added iff the instruction count would not exceed the maximum.
+
+        It is guaranteed that the mutated program will be distinct from original.
+
+        :param program: the program to mutate.
+        """
         originalHash: int = hash(program)
 
         # delete an instruction
@@ -73,6 +106,29 @@ class Mutator:
     # TODO: Add a hash for teams so we know each team is unique after mutation
     @staticmethod
     def mutateTeam(programPopulation: List[Program], teamPopulation: List[Team], team: Team):
+        """
+        A team can be mutated by:
+
+        - Adding an existing program
+
+        - Deleting a program
+
+        - Creating a new program and assigning it to the team
+
+        - Changing a program's action to a new action
+
+        - Changing a program's action to reference another team
+
+        An existing program will be added iff the program isn't already used by the team.
+        
+        A program will be deleted iff the program has at least one program remaining.
+
+        It is guaranteed that after mutation the team will have at least one atomic action.
+        
+        :param programPopulation: all programs at time of mutation
+        :param teamPopulation: all teams at time of mutation
+        :param team: the team to mutate
+        """
         # add a program
         if random.random() < Parameters.ADD_PROGRAM_PROBABILITY:
             
