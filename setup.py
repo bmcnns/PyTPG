@@ -22,7 +22,6 @@ setup(
         'numba',
         'numpy',
         'pandas',
-        'pdoc',
         'pillow',
         'pyparsing',
         'seaborn',
@@ -30,5 +29,8 @@ setup(
         'tzdata',
         'unittest-xml-reporting',
         'networkx',
+        'sphinx',
+        'sphinx_rtd_theme',
+        'myst_parser'
     ],
 )

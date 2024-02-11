@@ -1,6 +1,12 @@
 import numpy as np
 import random
 
+
+class Bryceroni:
+    def test():
+        """Test method 3"""
+        return
+
 NTSC_PALETTE = np.array([
     0x000000,0x000000,0x4a4a4a,0x4a4a4a,0x6f6f6f,0x6f6f6f,0x8e8e8e,0x8e8e8e,
     0xaaaaaa,0xaaaaaa,0xc0c0c0,0xc0c0c0,0xd6d6d6,0xd6d6d6,0xececec,0xececec,
@@ -162,4 +168,10 @@ class Atari:
 
     @staticmethod
     def preprocess(buffer: np.ndarray) -> np.ndarray:
+        """
+        Apply this method to reduce the dimensionality of the Atari's screen from (210,160,3) to a (1344,) feature vector.
+
+        :param buffer: The Atari screen's raw RGB data of shape (210,160,3).
+        :return: The Atari screen downsampled to a feature vector of shape (1344,)
+        """
         return Atari.reduceDimensionality(Atari.checkerMask(Atari.RGBtoSECAM(buffer)), dimensions=(42,32))
