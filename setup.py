@@ -30,7 +30,7 @@ setup(
         'unittest-xml-reporting',
         'networkx',
         'sphinx',
-        'sphinx_rtd_theme',
+        'sphinx_book_theme',
         'myst_parser'
     ],
 )
