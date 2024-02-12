@@ -9,8 +9,18 @@ import matplotlib.pyplot as plt
 import uuid
 
 class Debugger:
+	"""
+	The Debugger classes provides functionality to display information
+	about the team and program population as well as the ability to visualize
+	the policy graphs created by root teams.
+	"""
 
-	def screenshot(self, model: Model):
+	def screenshot(self, model: Model) -> None:
+		"""
+		Display the policy graph for each root team.
+
+		:param model: the model to display
+		"""
 		G = nx.Graph()
 
 		def process_team(team):
@@ -22,7 +32,7 @@ class Debugger:
 			for program in team.programs:
 				# Add program as a node with custom shape and different color
 				G.add_node(program.id, shape='{}', color='lightgray', node_type='program')
-
+				
 				if program.action in Parameters.ACTIONS:
 					actionId: str = str(uuid.uuid4())
 					G.add_edge(team.id, program.id) 
@@ -77,18 +87,27 @@ class Debugger:
 		plt.show()
 		
 	def getInformation(self, model: Model) -> str:
+		"""
+		- Displays all programs and their corresponding actions
 
+		- Displays all teams and the programs they reference
+		
+		:param model: the model to get information about.
+
+		:return: human-readable information about the program and team populations. 
+		"""
 		output: Str = "PROGRAMS:\n"
 		for program in model.programPopulation:
 			output += f"{program.id}: {program.action}\n"
 
 		output += "TEAMS:\n"
+
 		for team in model.teamPopulation:
 			if team.referenceCount == 0:
 				output += "ROOT TEAM "
 			else:
 				output += "TEAM "
-
+				
 			output += f"{team.id}\n"
 
 			for program in team.programs:

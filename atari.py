@@ -1,11 +1,6 @@
 import numpy as np
 import random
-
-
-class Bryceroni:
-    def test():
-        """Test method 3"""
-        return
+from typing import Tuple
 
 NTSC_PALETTE = np.array([
     0x000000,0x000000,0x4a4a4a,0x4a4a4a,0x6f6f6f,0x6f6f6f,0x8e8e8e,0x8e8e8e,
@@ -41,6 +36,11 @@ NTSC_PALETTE = np.array([
     0x482c00,0x2f2f2f,0x694d14,0x4f4f4f,0x866a26,0x6b6b6b,0xa28638,0x858585,
     0xbb9f47,0x9d9d9d,0xd2b656,0xb3b3b3,0xe8cc63,0xc8c8c8,0xfce070,0xdcdcdc
 ]);
+"""
+The NTSC colour palette used by the STELLA Atari emulator
+
+:meta hide-value:
+"""
 
 SECAM_PALETTE = np.array([
     0x000000,0x000000,0x2121ff,0x3a3a3a,0xf03c79,0x797979,0xff50ff,0x989898,
@@ -76,6 +76,11 @@ SECAM_PALETTE = np.array([
     0x000000,0x000000,0x2121ff,0x3a3a3a,0xf03c79,0x797979,0xff50ff,0x989898,
     0x7fff00,0xbcbcbc,0x7fffff,0xd9d9d9,0xffff3f,0xe9e9e9,0xffffff,0xffffff
 ]);
+"""
+The SECAM colour palette used by the STELLA Atari emulator
+
+:meta hide-value:
+"""
 
 SECAM_RGB_MAPPING = {
     0x000000: (0, 0, 0),
@@ -93,6 +98,11 @@ SECAM_RGB_MAPPING = {
     0xe9e9e9: (233, 233, 233),
     0xffffff: (255, 255, 255)
 }
+"""
+Maps SECAM bytes to RGB values (3,) 
+
+:meta hide-value:
+"""
 
 SECAM_BYTE_ENCODING = {
     0x000000: 0b00000000,
@@ -110,68 +120,113 @@ SECAM_BYTE_ENCODING = {
     0xe9e9e9: 0b00001100, 
     0xffffff: 0b00001101 
 }
+"""
+Byte encodings of SECAM colours 
 
+:meta hide-value:
+"""
 
 NTSC_SECAM_MAPPING = dict(zip(NTSC_PALETTE, SECAM_PALETTE))
+"""
+Mapping between NTSC colours to SECAM colours
+
+:meta hide-value:
+"""
 
 class Atari:
+	
+	@staticmethod
+	def RGBtoSECAM(buffer: np.ndarray) -> np.ndarray:
+		"""
+		Converts a (210,160,3) screen buffer to a (210,160) buffer of SECAM colour-encoded bytes.
 
-    @staticmethod
-    def RGBtoSECAM(buffer: np.ndarray) -> np.ndarray:
-        r,g,b = buffer[:,:,0], buffer[:, :, 1], buffer[:, :, 2]
-        ntsc = (r * 65536) + (g * 256) + b
-        return np.vectorize(NTSC_SECAM_MAPPING.get)(ntsc)
+		:param buffer: the (210,160,3) screen of RGB pixels
 
-    @staticmethod
-    def SECAMtoRGB(buffer: np.ndarray) -> np.ndarray:
-        rgb_colors = np.array([SECAM_RGB_MAPPING[color] for color in buffer.flat], dtype=np.uint8)
-        return rgb_colors.reshape(buffer.shape + (3,))
+		:return: a (210,160) buffer of SECAM colour-encoded bytes.
+		"""
+		
+		r,g,b = buffer[:,:,0], buffer[:, :, 1], buffer[:, :, 2]
+		ntsc = (r * 65536) + (g * 256) + b
+		return np.vectorize(NTSC_SECAM_MAPPING.get)(ntsc)
+	
+	@staticmethod
+	def SECAMtoRGB(buffer: np.ndarray) -> np.ndarray:
+		"""
+		Converts a (210,160) buffer of SECAM colour-encoded bytes to a (210,160,3) RGB image.
 
-    @staticmethod
-    def checkerMask(buffer: np.ndarray) -> np.ndarray:
-        # Create a checkerboard mask
-        mask = np.indices(buffer.shape).sum(axis=0) % 2 == 0
+		:param buffer: the (210, 160) buffer of SECAM colour-encoded bytes
 
-        # Create a copy of the buffer
-        result = buffer.copy()
+		:return: a (210,160,3) RGB image.
+		"""
+		rgb_colors = np.array([SECAM_RGB_MAPPING[color] for color in buffer.flat], dtype=np.uint8)
+		return rgb_colors.reshape(buffer.shape + (3,))
 
-        # Set the skipped pixels to 0x0
-        result[~mask] = 0x0
+	@staticmethod
+	def checkerMask(buffer: np.ndarray) -> np.ndarray:
+		"""
+		Applies a checkerboard mask to mask-out every other pixel in a buffer.
+		This is used to reduce the amount of pixel information.
+		This works because all important game entities are larger than a single pixel.
 
-        return result
+		:param buffer: a (210,160) SECAM byte encoded image.
 
-    @staticmethod
-    def reduceDimensionality(buffer: np.ndarray, dimensions) -> np.ndarray:
-        result = np.zeros(shape=dimensions)
-        chunkSize = 5
+		:return: a (210,160) SECAM byte encoded image with half the pixels masked to black.
+		"""
+		# Create a checkerboard mask
+		mask = np.indices(buffer.shape).sum(axis=0) % 2 == 0
 
-        # Break the 210, 160 image into chunks of chunkSize (5)
-        for j in range(0, dimensions[0]):
-            for i in range(0, dimensions[1]):
-                row = j * chunkSize
-                col = i * chunkSize
-                chunk = buffer[row:row+chunkSize, col:col+chunkSize]
+		# Create a copy of the buffer
+		result = buffer.copy()
 
-                # Filter out all the black or masked pixels
-                colours = chunk[chunk != 0]
+		# Set the skipped pixels to 0x0
+		result[~mask] = 0x0
 
-                # Uniformly sample a non-black/masked pixel
-                if len(colours) != 0:
-                    result[j][i] = random.choice(colours)
-                    # All pixels are black, therefore the sampled pixel must be black
-                else:
-                    result[j][i] = 0
+		return result
 
-        # Convert the (42,32) SECAM-encoded image to a 1344-dim state vector
-        # where each feature ranges from 0 to 13
-        return np.array([SECAM_BYTE_ENCODING[color] for color in result.flat])
+	@staticmethod
+	def reduceDimensionality(buffer: np.ndarray, dimensions: Tuple[int] = (42,32)) -> np.ndarray:
+		"""
+		Downsamples a (210,160) image into a (42,32) image and returns a (1344,) feature vector.
+		This operation is performed by splitting the image into 'chunkSize' non-overlapping chunks.
+		Each non-overlapping chunk is a 5x5 image representing one pixel in the (42,32) image.
+		The pixel in the (42,32) image is a colour uniformly sampled from the non-black colours within the chunk.
+		The (42,32) image is flattened into a (1344,) feature vector.
 
-    @staticmethod
-    def preprocess(buffer: np.ndarray) -> np.ndarray:
-        """
-        Apply this method to reduce the dimensionality of the Atari's screen from (210,160,3) to a (1344,) feature vector.
+		:param buffer: a (210,160) SECAM byte-encoded image
+		:param dimensions: the shape of the downsampled image. recommended: (42,32).
+		
+		:return: 
+		"""
+		result = np.zeros(shape=dimensions)
+		chunkSize = 5
 
-        :param buffer: The Atari screen's raw RGB data of shape (210,160,3).
-        :return: The Atari screen downsampled to a feature vector of shape (1344,)
-        """
-        return Atari.reduceDimensionality(Atari.checkerMask(Atari.RGBtoSECAM(buffer)), dimensions=(42,32))
+		# Break the 210, 160 image into chunks of chunkSize (5)
+		for j in range(0, dimensions[0]):
+			for i in range(0, dimensions[1]):
+				row = j * chunkSize
+				col = i * chunkSize
+				chunk = buffer[row:row+chunkSize, col:col+chunkSize]
+
+				# Filter out all the black or masked pixels
+				colours = chunk[chunk != 0]
+
+				# Uniformly sample a non-black/masked pixel
+				if len(colours) != 0:
+					result[j][i] = random.choice(colours)
+					# All pixels are black, therefore the sampled pixel must be black
+				else:
+					result[j][i] = 0
+
+		# Convert the (42,32) SECAM-encoded image to a 1344-dim state vector
+		# where each feature ranges from 0 to 13
+		return np.array([SECAM_BYTE_ENCODING[color] for color in result.flat])
+
+	@staticmethod
+	def preprocess(buffer: np.ndarray) -> np.ndarray:
+		"""
+		Apply this method to reduce the dimensionality of the Atari's screen from (210,160,3) to a (1344,) feature vector.
+
+		:param buffer: The Atari screen's raw RGB data of shape (210,160,3).
+		:return: The Atari screen downsampled to a feature vector of shape (1344,)
+		"""
+		return Atari.reduceDimensionality(Atari.checkerMask(Atari.RGBtoSECAM(buffer)))

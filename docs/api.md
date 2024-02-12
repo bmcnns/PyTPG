@@ -1,6 +1,17 @@
 # Atari
 ```{eval-rst}
+.. automodule:: atari
 .. autoclass:: atari.Atari
+```
+
+# Model
+```{eval-rst}
+.. autoclass:: model.Model
+```
+
+# Debugger
+```{eval-rst}
+.. autoclass:: debugger.Debugger
 ```
 
 # Team

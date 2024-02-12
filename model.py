@@ -9,21 +9,25 @@ from typing import List, Tuple, Dict
 import numpy as np
 
 class Model:
+    """ The Model class wraps all Tangled Program Graph functionality into an easy-to-use class. """
 
-    # A model consists of a population of teams and a population of programs.
-    """ A model consists of a population of teams and a population of programs."""
     def __init__(self):
 
-        # Initialize the program population
+        #: The pool of available (competitive) programs 
         self.programPopulation: List[Program] = [ Program() for _ in range(Parameters.INITIAL_PROGRAM_POPULATION)]
 
-        # Initialize the team population
+        #: The pool of competitive teams 
         self.teamPopulation: List[Team] = [ Team(self.programPopulation) for _ in range(Parameters.POPULATION_SIZE)]
 
         for team in self.teamPopulation:
             team.referenceCount = 0
 
     def getRootTeams(self) -> List[Team]:
+        """
+        Gets a list of teams that are not referenced by any other team (root teams).
+
+        :return: A list of root teams.
+        """
         rootTeams: List[Team] = []
         for team in self.teamPopulation:
             if team.referenceCount == 0:
@@ -32,7 +36,13 @@ class Model:
         return rootTeams
 
     def fit(self, environment: Environment, numGenerations: int, maxStepsPerGeneration: int) -> None:
+        """
+        Trains the model against a given environment to learn the optimal policy to maximize cumulative reward.
 
+        :param environment: The environment to train against
+        :param numGenerations: The number of generations to train the model for.
+        :param maxStepsPerGeneration: How many actions the agent can make before time-out.
+        """
         for generation in range(1, numGenerations+1):
             for teamNum, team in enumerate(self.getRootTeams()):
 
@@ -69,11 +79,15 @@ class Model:
                 print(f"Team {team.id} score: {team.getFitness()}, lucky breaks: {team.luckyBreaks}")
             print()
             
-            self.select(generation)
+            self.select()
 
             self.evolve()
 
     def cleanProgramPopulation(self) -> None:
+        """
+        Used internally. After teams are removed from the population, clean up any programs
+        that are no longer in use, since they are no longer competitive.
+        """
         inUseProgramIds: List[str] = []
         for team in self.teamPopulation:
             for program in team.programs:
@@ -83,12 +97,14 @@ class Model:
             if program.id not in inUseProgramIds:
                 self.programPopulation.remove(program)
 
-    # Remove uncompetitive teams from the population
-    def select(self, generation: int = -1) -> None:
-
+    def select(self) -> None:
+        """
+        After agents (root teams) are evaluated in a generation, this method is called
+        to sort them by fitness and remove POPGAP percentage of the total root team population.
+        The program population is cleaned after teams are removed.
+        """
         sortedTeams: List[Team] = list(sorted(self.getRootTeams(), key=lambda team: team.getFitness()))
 
-        # Remove a POPGAP fraction of teams
         remainingTeamsCount: int = int(Parameters.POPGAP * len(self.getRootTeams()))
 
         for team in sortedTeams[:remainingTeamsCount]:
@@ -100,12 +116,13 @@ class Model:
                 print(f"Removing team {team.id} with fitness {team.getFitness()}")
                 self.teamPopulation.remove(team)
 
-        # Clean up, if there are programs that are not referenced by any teams.
-        # Remove them
         self.cleanProgramPopulation() 
 
-    # Create new teams cloned from the remaining root teams
     def evolve(self) -> None:
+        """
+        After removing the uncompetitive teams, clone the remaining competitive root teams
+        and apply mutations to the clones until the discarded population is replaced.
+        """
         while len(self.getRootTeams()) < Parameters.POPULATION_SIZE:
             team = random.choice(self.getRootTeams()).copy()
             Mutator.mutateTeam(self.programPopulation, self.teamPopulation, team)
