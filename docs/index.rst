@@ -7,3 +7,4 @@ Welcome to PyTPG's documentation!
 
    README.md
    api.md
+   testing.md

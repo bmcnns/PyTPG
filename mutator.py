@@ -24,6 +24,7 @@ class Mutator:
         :param instruction: the instruction to mutate
         """
         parts: List[str] = [ "ADDRESSING_MODE", "OPERATION", "SOURCE REGISTER", "DESTINATION REGISTER"]
+
         mutatedPart: str = random.choice(parts)
 
         originalHash: int = hash(instruction)
@@ -38,7 +39,7 @@ class Mutator:
                 instruction.source = instruction.source % Parameters.NUM_REGISTERS
                 
         elif mutatedPart == "OPERATION":
-            instruction.operation = random.choice(['+', '-', '*', '/'])
+            instruction.operation = random.choice(['+', '-', '*', '/', 'COS', 'NEGATE'])
 
         elif mutatedPart == "SOURCE REGISTER":
             if instruction.mode == "INPUT":

@@ -35,7 +35,7 @@ class Instruction:
 
 		:return: the instruction casted to a string.
 		"""
-		address: str = "STATE" if self.operation == "INPUT" else "R"
+		address: str = "STATE" if self.mode == "INPUT" else "R"
 
 		if self.operation == "COS":
 			return f"R[{self.destination}] = COS({address}[{self.source}])"

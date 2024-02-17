@@ -1,40 +1,42 @@
-# Atari
+# API Reference
+
+## Atari
 ```{eval-rst}
 .. automodule:: atari
 .. autoclass:: atari.Atari
 ```
 
-# Model
+## Model
 ```{eval-rst}
 .. autoclass:: model.Model
 ```
 
-# Debugger
+## Debugger
 ```{eval-rst}
 .. autoclass:: debugger.Debugger
 ```
 
-# Team
+## Team
 ```{eval-rst}
 .. autoclass:: team.Team
 ```
 
-# Instruction
+## Instruction
 ```{eval-rst}
 .. autoclass:: instruction.Instruction
 ```
 
-# Program
+## Program
 ```{eval-rst}
 .. autoclass:: program.Program
 ```
 
-# Mutator
+## Mutator
 ```{eval-rst}
 .. autoclass:: mutator.Mutator
 ```
 
-# Environment
+## Environment
 ```{eval-rst}
 .. autoclass:: environment.Environment
 
@@ -47,7 +49,7 @@
    :inherited-members:
 ```
 
-# Parameters
+## Parameters
 ```{eval-rst}
 .. automodule:: parameters
 ```

@@ -1,2 +1,1 @@
-# README
-Welcome to PyTPG
+# Quickstart 
