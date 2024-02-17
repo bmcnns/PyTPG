@@ -4,6 +4,7 @@ import numpy as np
 from ale_py import ALEInterface
 from ale_py.roms import Frostbite, UpNDown
 from atari import Atari
+import gymnasium as gym
 import random
 
 class Environment:

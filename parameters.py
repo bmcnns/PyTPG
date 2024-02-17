@@ -7,7 +7,7 @@ class Parameters:
     """
 
     #: The quantity of root teams per generation.
-    POPULATION_SIZE: int = 360
+    POPULATION_SIZE: int = 10
 
     #: The number of programs generated in the first generation.
     INITIAL_PROGRAM_POPULATION: int = 1000
@@ -16,13 +16,13 @@ class Parameters:
     POPGAP: float = 0.5
     
     #: The list of possible actions for the environment.
-    ACTIONS: List = range(0, 18) 
+    ACTIONS: List = ['LEFT', 'RIGHT'] #range(0, 18) 
 
     #: The name of the environment.
-    ENVIRONMENT: str = "Frostbite"
+    ENVIRONMENT: str = "CartPole-v1"
 
     #: The size of the state/observation space.
-    NUM_OBSERVATIONS: int = 1344
+    NUM_OBSERVATIONS: int = 4#1344
 
     #: The number of registers that all programs have.
     NUM_REGISTERS: int = 8

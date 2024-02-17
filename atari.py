@@ -146,7 +146,7 @@ class Atari:
 		
 		r,g,b = buffer[:,:,0], buffer[:, :, 1], buffer[:, :, 2]
 		ntsc = (r * 65536) + (g * 256) + b
-		return np.vectorize(NTSC_SECAM_MAPPING.get)(ntsc)
+		return np.vectorize(Atari.NTSC_SECAM_MAPPING.get)(ntsc)
 	
 	@staticmethod
 	def SECAMtoRGB(buffer: np.ndarray) -> np.ndarray:
@@ -218,7 +218,7 @@ class Atari:
 
 		# Convert the (42,32) SECAM-encoded image to a 1344-dim state vector
 		# where each feature ranges from 0 to 13
-		return np.array([SECAM_BYTE_ENCODING[color] for color in result.flat])
+		return np.array([Atari.SECAM_BYTE_ENCODING[color] for color in result.flat])
 
 	@staticmethod
 	def preprocess(buffer: np.ndarray) -> np.ndarray:

@@ -3,6 +3,9 @@ from program import Program
 from team import Team
 from mutator import Mutator
 from parameters import Parameters
+from statistics import Statistics
+
+import matplotlib.pyplot as plt
 
 import random
 from typing import List, Tuple, Dict
@@ -12,6 +15,8 @@ class Model:
     """ The Model class wraps all Tangled Program Graph functionality into an easy-to-use class. """
 
     def __init__(self):
+
+        self.statistics = Statistics()
 
         #: The pool of available (competitive) programs 
         self.programPopulation: List[Program] = [ Program() for _ in range(Parameters.INITIAL_PROGRAM_POPULATION)]
@@ -62,6 +67,8 @@ class Model:
                         break
 
                 team.scores.append(score)
+                self.statistics.recordPerformance(team, generation, score)
+
                 # assign score to team
 
                 print(f"Generation #{generation} Team #{teamNum + 1} ({team.id})")
@@ -73,15 +80,22 @@ class Model:
             print("Best performing teams:")
             sortedTeams: List[Team] = list(sorted(self.getRootTeams(), key=lambda team: team.getFitness()))
 
-            for team in sortedTeams[-5:]:
+            for team in sortedTeams[-1:]:
                 team.luckyBreaks += 1
-            for team in sortedTeams[-5:]:
+            for team in sortedTeams[-1:]:
                 print(f"Team {team.id} score: {team.getFitness()}, lucky breaks: {team.luckyBreaks}")
             print()
+
+            self.statistics.recordInstructionBreakdown(team, generation)
+
+            #self.statistics.getInstructionHistogram()
+            self.statistics.getInstructionDistributionViolinPlot()
+            plt.show()
             
             self.select()
 
             self.evolve()
+
 
     def cleanProgramPopulation(self) -> None:
         """
