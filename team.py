@@ -6,6 +6,7 @@ from uuid import uuid4
 from typing import List
 from copy import deepcopy
 from parameters import Parameters
+from action import Action
 
 import numpy as np
 
@@ -20,16 +21,20 @@ class Team:
 		"""
 
 		#: The unique identifier for the team
-		self.id: UUID = uuid4()
+		self.id: str = str(uuid4())
 
 		#: The cumulative rewards assigned to the team for each generation
 		self.scores: List[float] = []
-		
+
 		#: The programs assigned to the team
 		self.programs: List[Program] = [] 
 
-		actions: List[str] = []
+		actions: List[Action] = []
 
+		self.referenceCount: int = 0
+
+		# reset every time getAction() is called
+		self.policy: List[Action] = []
 		self.luckyBreaks: int = 0
 		"""
 		This is a method of keeping elites. If a team is top-performing in a round, it is awarded a lucky break.
@@ -40,9 +45,9 @@ class Team:
 
 		size: int = random.randint(2, Parameters.MAX_INITIAL_TEAM_SIZE)
 
-		while len(list(set(actions))) < 2:
+		while len(list(set([action.value for action in actions ]))) < 2:
 			self.programs: List[Program] = random.sample(programPopulation, k=size)
-			actions: List[str] = [ program.action for program in self.programs] 
+			actions: List[Action] = [ program.action for program in self.programs] 
 
 	# Choose the program with the highest confidence
 	def getAction(self, teamPopulation: List['Team'], state: np.array, visited: List[str] = []) -> str:
@@ -57,21 +62,27 @@ class Team:
 
 		:return: an atomic action
 		"""
-		visited.append(self)
 
+		# First time getAction is called, reset the policy
+		self.policy = []
+
+		visited.append(self)
+		
 		sortedPrograms = sorted(self.programs, key=lambda program: program.bid(state)['confidence'])
 		
 		for program in sortedPrograms:
-			if program.action in Parameters.ACTIONS:
+			if program.action.value in Parameters.ACTIONS:
 				if program.action == None:
 					raise RuntimeError("A NONE ACTION WAS ENCOUNTERED HERE")
-				return program.action
+				self.policy.append(program.action.id)
+				return program.action.value
 			else:
 				for team in teamPopulation:
-					if str(team.id) == program.action:
+					if str(team.id) == program.action.value:
+						self.policy.append(program.action.id)
 						return team.getAction(teamPopulation, state, visited)
-				return random.choice(Parameters.ACTIONS)
-				raise RuntimeError(f"Team {self.id} points to team {program.action}, and that team does not exist within the population.")
+				return Action(random.choice(Parameters.ACTIONS)).value
+				raise RuntimeError(f"Team {self.id} points to team {program.action.value}, and that team does not exist within the population.")
 
 	def getFitness(self):
 		"""
@@ -82,6 +93,12 @@ class Team:
 		"""
 		return self.scores[-1]
 
+	def __str__(self) -> str:
+		output = f"TEAM {self.id}\n"
+		for program in self.programs:
+			output += f"{program.id}->{program.action.value}\n"
+		return output
+	
 	# Given a parent team, a new offspring team is cloned and mutated
 	def copy(self) -> "Team":
 		"""
@@ -93,7 +110,12 @@ class Team:
 		:return: A new team with identical behaviour to the team that was cloned.
 		"""
 		clone: 'Team' = deepcopy(self)
+		clone.programs = []
+
+		for program in self.programs:
+			clone.programs.append(program.copy())
+		
 		clone.referenceCount = 0
 		clone.luckyBreaks = 0
-		clone.id = uuid4()
+		clone.id = str(uuid4())
 		return clone

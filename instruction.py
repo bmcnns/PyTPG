@@ -87,6 +87,6 @@ class Instruction:
 				registers[self.destination] = -registers[self.destination]
 
 		if registers[self.destination] == np.inf:
-			registers[self.destination] = np.finfo(np.float64).max
+			registers[self.destination] = 0#np.finfo(np.float64).min
 		elif registers[self.destination] == np.NINF:
-			registers[self.destination] = np.finfo(np.float64).min
+			registers[self.destination] = 0#np.finfo(np.float64).min
