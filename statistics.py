@@ -5,7 +5,6 @@ from debugger import Debugger
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
-import seaborn as sns
 
 import os
 
