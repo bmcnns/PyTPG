@@ -43,6 +43,7 @@ jobs:
             pip install -e .
             
       - name: Run
+        timeout-minutes: 300
         run: |
           command="python main.py \
           --environment ${{ github.event.inputs.environment }} \
@@ -64,3 +65,9 @@ jobs:
           fi
 
           $command
+
+      - name: Archive bin/ folder
+        uses: actions/upload-artifact@v2
+        with:
+          name: bin
+          path: bin/
