@@ -1,6 +1,6 @@
 name: run
 
-on:
+runs-on:
   workflow_dispatch:
     inputs:
       environment:
