@@ -44,12 +44,29 @@ jobs:
             
       - name: Run
         run: |
-          python main.py \
-          --environment ${{github.event.inputs.environment}} \
-          --population_size ${{github.event.inputs.population_size}} \
-          --num_observations ${{github.event.inputs.num_observations}} \
-          --num_generations ${{github.event.inputs.num_generations}} \
-          --max_steps ${{github.event.inputs.max_steps}} \
-          {% if github.event.inputs.actions %}--actions ${{github.event.inputs.actions}}{% endif %} \
-          {% if github.event.inputs.generation %}--generation ${{github.event.inputs.generation}}{% endif %} \
-          {% if github.event.inputs.model %}--model ${{github.event.inputs.model}}{% endif %}
+          command="python main.py \
+          --environment ${{ github.event.inputs.environment }} \
+          --population_size ${{ github.event.inputs.population_size }} \
+          --num_observations ${{ github.event.inputs.num_observations }} \
+          --num_generations ${{ github.event.inputs.num_generations }} \
+          --max_steps ${{ github.event.inputs.max_steps }}"
+
+          if [ -n "${{ github.event.inputs.actions }}" ]; then
+          command="$command --actions ${{ github.event.inputs.actions }}"
+          fi
+
+          if [ -n "${{ github.event.inputs.generation }}" ]; then
+          command="$command --generation ${{ github.event.inputs.generation }}"
+          fi
+
+          if [ -n "${{ github.event.inputs.model }}" ]; then
+          command="$command --model ${{ github.event.inputs.model }}"
+          fi
+
+          $command
+
+      - name: Upload
+        - uses: actions/upload-artifact@v4
+          with:
+            name: drop
+            path: bin/
