@@ -64,9 +64,3 @@ jobs:
           fi
 
           $command
-
-      - name: Upload
-        - uses: actions/upload-artifact@v4
-          with:
-            name: drop
-            path: bin/
