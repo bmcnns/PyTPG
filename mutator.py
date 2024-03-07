@@ -132,11 +132,7 @@ class Mutator:
 		:param teamPopulation: all teams at time of mutation
 		:param team: the team to mutate
 		"""
-		numAtomicActions: int = 0
-		for program in team.programs:
-			if program.action.value in Parameters.ACTIONS:
-				numAtomicActions += 1
-
+		
 		# add a program
 		if random.random() < Parameters.ADD_PROGRAM_PROBABILITY:
 			if len(team.programs) < Parameters.MAX_PROGRAM_COUNT:
@@ -169,7 +165,12 @@ class Mutator:
 		if random.random() < Parameters.MUTATE_PROGRAM_PROBABILITY:
 			
 			program: Program = random.choice(team.programs)
-			
+
+			numAtomicActions: int = 0
+			for program in team.programs:
+				if program.action.value in Parameters.ACTIONS:
+					numAtomicActions += 1
+
 			# A team must have at least one atomic action!
 			if numAtomicActions > 1 and random.random() < Parameters.TEAM_POINTER_PROBABILITY:
 				newTeam: Team = random.choice(teamPopulation)
@@ -179,9 +180,9 @@ class Mutator:
 				newTeam.referenceCount += 1    
 				program.action = Action(str(newTeam.id))
 			else:
-				if program.action.value not in Parameters.ACTIONS:
-					for t in teamPopulation:
-						if str(t.id) == program.action.value:
-							t.referenceCount -= 1
+				#if program.action.value not in Parameters.ACTIONS:
+				#	for t in teamPopulation:
+				#		if str(t.id) == program.action.value:
+							#t.referenceCount -= 1
 							
 				program.action = Action(random.choice(Parameters.ACTIONS))

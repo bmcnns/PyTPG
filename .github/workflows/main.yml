@@ -3,35 +3,36 @@ name: run
 on:
   workflow_dispatch:
     inputs:
-      NUM_GENERATIONS:
-        description: 'Number of generations'
-        required: false
-        default: '200'
-      MAX_STEPS:
-        description: 'Maximum amount of steps'
-        required: false
-        default: '1000'
-      POPULATION_SIZE:
-        description: 'The population size'
-        required: false
+      environment:
+        description: 'The environment to benchmark against (e.g. Frostbite, LunarLander-v2)'
+        required: true
+      population_size:
+        description: 'The number of root teams in every generation'
+        required: true
         default: '360'
-      ACTIONS:
-        description: 'The actions list'
+      actions:
+        description: 'A comma separated list of actions used in the environment. Omit this argument for Atari' 
         required: false
-        default: '["LEFT", "RIGHT"]'
-      ENVIRONMENT:
-        description: 'The environment'
+      num_observations:
+        description: 'The size of the input/feature space'
+        required: True
+      num_generations:
+        description: 'The number of generations the model will be trained for.'
+        required: True
+      max_steps:
+        description: 'The number of interactions an agent can have with its environment before termination'
+        required: true
+        default: '500'
+      generation:
+        description: 'The number that the generation counter should be initialized to. (helpful when loading/saving a model'
         required: false
-        default: 'CartPole-v1'
-      NUM_OBSERVATIONS:
-        description: 'The number of observations'
+        default: '1'
+      model:
+        description: 'The path to the model file to load.' 
         required: false
-        default: '4'
 
 jobs:
   deploy:
-    timeout-minutes: 4320
-    runs-on: self-hosted
 
     steps:
       - name: Checkout Repository
@@ -43,4 +44,12 @@ jobs:
             
       - name: Run
         run: |
-          python main.py --NUM_GENERATIONS ${{github.event.inputs.NUM_GENERATIONS}} --MAX_STEPS ${{github.event.inputs.MAX_STEPS}} --POPULATION_SIZE ${{github.event.inputs.POPULATION_SIZE}} --ACTIONS ${{github.event.inputs.ACTIONS}} --ENVIRONMENT ${{github.event.inputs.ENVIRONMENT}} --NUM_OBSERVATIONS ${{github.event.inputs.NUM_OBSERVATIONS}}
+          python main.py \
+          --environment ${{github.event.inputs.environment}} \
+          --population_size ${{github.event.inputs.population_size}} \
+          --num_observations ${{github.event.inputs.num_observations}} \
+          --num_generations ${{github.event.inputs.num_generations}} \
+          --max_steps ${{github.event.inputs.max_steps}} \
+          {% if github.event.inputs.actions %}--actions ${{github.event.inputs.actions}}{% endif %} \
+          {% if github.event.inputs.generation %}--generation ${{github.event.inputs.generation}}{% endif %} \
+          {% if github.event.inputs.model %}--model ${{github.event.inputs.model}}{% endif %}

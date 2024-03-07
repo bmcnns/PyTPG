@@ -13,7 +13,7 @@ class Program:
 	def __init__(self):
 
 		#: A unique id given to the program for identification
-		self.id: UUID = uuid4()
+		self.id: UUID = str(uuid4())
 
 		#: A set of registers modified during program execution. This is emergent behaviour.
 		self.registers: np.array = np.zeros(Parameters.NUM_REGISTERS)

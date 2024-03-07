@@ -81,8 +81,7 @@ class Team:
 					if str(team.id) == program.action.value:
 						self.policy.append(program.action.id)
 						return team.getAction(teamPopulation, state, visited)
-				return Action(random.choice(Parameters.ACTIONS)).value
-				raise RuntimeError(f"Team {self.id} points to team {program.action.value}, and that team does not exist within the population.")
+				raise RuntimeError(f"Team {self.id, type(self.id)} points to team {program.action.value, type(program.action.value)}, and that team does not exist within the population.")
 
 	def getFitness(self):
 		"""
