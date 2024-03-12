@@ -43,7 +43,8 @@ jobs:
             pip install -e .
             
       - name: Run
-        timeout-minutes: 300
+        timeout-minutes: 3
+        continue-on-error: true
         run: |
           command="python main.py \
           --environment ${{ github.event.inputs.environment }} \
