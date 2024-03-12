@@ -54,6 +54,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
             
+      - name: Download previously trained models
+        run: |
+          aws s3 cp s3://tpg-models/ models/
+        
       - name: Run
         timeout-minutes: 3
         continue-on-error: true
@@ -87,4 +91,4 @@ jobs:
 
       - name: Sync model data with S3
         run: |
-          aws s3 sync bin/ s3://tpg-models/ --recursive
+          aws s3 sync models/ s3://tpg-models/

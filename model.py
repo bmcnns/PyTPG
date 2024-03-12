@@ -98,7 +98,7 @@ class Model:
 				print(f"Team {team.id} score: {team.getFitness()}, lucky breaks: {team.luckyBreaks}")
 				print()
 
-			self.save(f"bin/models/{self.id}/{generation}.pkl")
+			self.save(f"models/{self.id}/{generation}.pkl")
 
 			self.select()
 			self.evolve(generation)
